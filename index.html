@@ -1,0 +1,308 @@
+<html>
+<head>
+	<style type="text/css">
+
+	#container {
+		width: 900px;
+		margin: auto;
+	}
+
+	#nickWrap {
+		position: relative;
+		margin: auto;
+		text-align: center;
+	}
+
+		#chat {
+			border: 1px solid black;
+			height: 600px;
+			max-height: 600px;
+			overflow-y: auto;
+			font-family: Verdana;
+		}
+
+		#contentWrap {
+			display: none;
+			margin: auto;
+			width: 900px;
+		}
+
+		#chatWrap {
+			border: 1px #000 solid;
+			width: 495px;
+			height: 600px;
+			margin: auto;
+			position:relative;
+		}
+
+		.error {
+			color: red;
+		}
+
+		.whisper {
+			color: green;
+			font-style: italic;
+		}
+
+
+
+		#users {
+			width: 200px;
+			position: absolute;
+			right: 500px;
+			border: solid 1px black;
+			top: -1px;
+			height: 100%;
+			overflow-y: auto;
+		}
+
+		#send-message {
+			position: relative;
+			left: 210px;
+			top: 2px;
+			}
+
+		.submission {
+			width: 420px;
+			height: 50px;
+			border: 1px solid black;
+			border-radius: 5px;
+		}
+
+		#gif_window {
+			border: solid 1px black;
+			width: 400px;
+			height: 600px;
+			max-height: 600px;
+			position: relative;
+			left: 700px;
+			bottom: 710px;
+			overflow-y: auto;
+		}
+
+		#gif_window img {
+			width: 190px;
+		}
+
+		#gif_search {
+			width: 300px;
+			position: relative;
+			top: -60px;
+			left: 755px;
+		}
+
+
+		input:focus::-webkit-input-placeholder { 
+			color:transparent; 
+		}
+
+		input:focus:-moz-placeholder { 
+			color:transparent; 
+		}
+
+		#Gif_Zone {
+			display: none;
+		}
+
+		#Gif_Button {
+			width: 35px;
+			height: 160px;
+			border-radius: 5px;
+			position: relative;
+			left: 697px;
+			bottom: 450px;
+		}
+
+		#Gif_Hide {
+			width: 35px;
+			height: 160px;
+			border-radius: 5px;
+			position: relative;
+			left: 1100px;
+			bottom: 1120px;
+		}
+
+		.userNameBlock {
+			margin: 3px;
+			font-family: Verdana;
+			cursor: pointer;
+		}
+
+		.userNameBlock:hover {
+			background: darkseagreen;
+		}
+
+	</style>
+
+	<title>Mashabout</title>
+
+</head>
+
+<body>
+
+	<div id="container">
+		<!--Initial Sign-In Form-->	
+	<div id="nickWrap">
+		<p>Welcome to Mashabout...</p>
+		<img src="http://www.itshappeningnews.com/img/1388244719973.gif">
+		<p>Choose Your Name</p>
+		<p id="nickError"></p>
+		<form id="setNick">
+			<input size="35" id="nickname"></input>
+			<input type="submit"></input>
+		</form>	
+	</div>
+		<!--Chat Page Seen Upon Sign-In-->	
+		<div id="contentWrap">
+
+			<div id="chatWrap">
+				<div id="users"></div>
+				<div id="chat">
+				</div>	
+			</div>
+
+				<form id="send-message" >
+						<input size="65" id="message" class="submission" placeholder="Type something, drag a gif or add a link here yo"></input>
+						<input type="submit"></input>
+				</form>
+
+					<div id="Gif_Zone">
+						<form id="gif_search" action="http://giphy.com/search/" method="GET">	
+							<input id="gifPull" size="32"  placeholder="Search for a GIF i.e. 'lol'"></input>
+							<input type="submit"></input>		
+						</form>
+
+						<div id="gif_window">	
+						</div>
+
+						<button id="Gif_Hide">Hide</button>		
+					</div>
+
+					<button id="Gif_Button">Gifs</button>
+
+
+		</div>
+		</div>
+
+
+
+	
+
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		jQuery(function($){
+			var socket = io.connect();
+			var $nickForm = $('#setNick');
+			var $nickError = $('#nickError');
+			var $nickBox = $('#nickname');
+			var $users = $('#users');
+			var $messageForm = $('#send-message');
+			var $messageBox = $('#message');
+			var $chat = $('#chat');
+			var $gifWindow = $('#gif_window');
+			var $gifButton = $('#Gif_Button');
+			var $gifHide = $('#Gif_Hide');
+			var $clickUser = $('#clickUser');
+
+
+			
+			
+
+			
+			
+			$nickForm.submit(function(e) {
+				e.preventDefault();
+				socket.emit('new user', $nickBox.val(), function(data) {
+					if(data) {
+						$('#nickWrap').hide();
+						$('#contentWrap').show();
+					} else {
+						$nickError.html('That name is taken bro, try another one.')
+					}
+				});
+				$nickBox.val('');
+			});
+
+			socket.on('usernames', function(data) {
+				var html = '';
+				for(var i = 0; i < data.length; i++) {
+					html += '<p class=\"userNameBlock\" id=\"clickUser\">' + data[i] + '</p>';
+				}
+				$users.html(html);
+			});
+
+			$("#users").on("dblclick", 'p', function(event) {
+  					alert($(this).text());
+					});
+
+
+			$messageForm.submit(function(e){
+				e.preventDefault();
+				socket.emit('send message', $messageBox.val(), function() {
+					$chat.append('<span class="error">' + data + "</span><br/>");
+				});
+				$messageBox.val('');
+			});
+
+			socket.on('load old msgs', function(docs) {
+				for(var i=docs.length-1; i >= 0; i--) {
+					displayMsg(docs[i]);
+				}
+			});
+			
+			socket.on('new message', function(data){
+				displayMsg(data);
+			});
+
+			function displayMsg(data) {
+				var scrollPosition = $("#chat").scrollTop();
+				 var scrollHeight = $("#chat")[0].scrollHeight;
+					$chat.append('<span class="msg"><b>' + data.nick + ': </b>' + data.msg + "</span><br/>");
+				    if (scrollPosition + $chat.height() === scrollHeight) { 
+				        $chat.scrollTop(scrollHeight);       
+    				}
+			}
+
+			socket.on('whisper', function(data) {
+				$chat.append('<span class="whisper"><b>' + data.nick + ': </b>' + data.msg + "</span><br/>");
+			});
+
+			$gifButton.on('click',function() {
+				$('#Gif_Zone').slideToggle(300);
+				$gifButton.hide("slow");
+			});
+
+			$gifHide.on('click',function() {
+				$('#Gif_Zone').slideToggle(300);
+				$gifButton.show("slow");
+			});
+
+			var $gifsearch = $('#gif_search');
+				
+				$gifsearch.submit(function(e){
+						e.preventDefault();
+						//we are now pulling the search query into the URL and grabbing a JSON object
+						var getGif = "http://api.giphy.com/v1/gifs/search?q=" + $('#gifPull').val() + "&api_key=dc6zaTOxFJmzC&limit=50";
+						//data object returned, now we need to pull the img url from the object and append them with img tags
+						 
+								$.getJSON(getGif, function(gifs) {
+									for (var i = 0; i < gifs.data.length; i++) {
+								  		$gifWindow.append('<img src=\"' + gifs.data[i].images.fixed_height.url + '\"\/>'); 
+								  	}
+								  });
+								 
+					
+					});
+		//end script
+		});
+
+		
+	</script>
+
+
+		
+
+</body>
+</html>

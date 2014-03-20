@@ -63,7 +63,7 @@
 			}
 
 		.submission {
-			width: 420px;
+			width: 400px;
 			height: 50px;
 			border: 1px solid black;
 			border-radius: 5px;
@@ -85,10 +85,10 @@
 		}
 
 		#gif_search {
-			width: 300px;
+			width: 385px;
 			position: relative;
-			top: -60px;
-			left: 755px;
+			top: -65px;
+			left: 710px;
 		}
 
 
@@ -132,6 +132,10 @@
 			background: darkseagreen;
 		}
 
+		p { 
+			font-family: Verdana;
+		}
+
 	</style>
 
 	<title>Mashabout</title>
@@ -167,7 +171,11 @@
 				</form>
 
 					<div id="Gif_Zone">
-						<form id="gif_search" action="http://giphy.com/search/" method="GET">	
+						<form id="gif_search">
+							<select id="select_channel">
+								<option value="giphy">Giphy</a>
+								<option value="replygif">ReplyGif</a>
+							</select>		
 							<input id="gifPull" size="32"  placeholder="Search for a GIF i.e. 'lol'"></input>
 							<input type="submit"></input>		
 						</form>
@@ -205,6 +213,7 @@
 			var $gifButton = $('#Gif_Button');
 			var $gifHide = $('#Gif_Hide');
 			var $clickUser = $('#clickUser');
+			var $selectChannel = $('#select_channel');
 
 
 			
@@ -279,11 +288,16 @@
 				$gifButton.show("slow");
 			});
 
+			
+			//Gif Search 
 			var $gifsearch = $('#gif_search');
-				
+
+
 				$gifsearch.submit(function(e){
 						e.preventDefault();
-						//we are now pulling the search query into the URL and grabbing a JSON object
+						if($selectChannel.val() == 'giphy') {
+							//Giphy.com
+								//we are now pulling the search query into the URL and grabbing a JSON object
 						var getGif = "http://api.giphy.com/v1/gifs/search?q=" + $('#gifPull').val() + "&api_key=dc6zaTOxFJmzC&limit=50";
 						//data object returned, now we need to pull the img url from the object and append them with img tags
 						 
@@ -292,9 +306,26 @@
 								  		$gifWindow.append('<img src=\"' + gifs.data[i].images.fixed_height.url + '\"\/>'); 
 								  	}
 								  });
+						} else {
+							//ReplyGif.net
+							var getGif = "http://replygif.net/api/gifs?tag=" + $('#gifPull').val() + "&tag-operator=and&api-key=39YAprx5Yi";
+
+						$.getJSON(getGif,function(json) {
+							if (json.length == 0) {
+								$gifWindow.append("<p>ReplyGif doesn't have the tag <b>\'" + $('#gifPull').val() + "\'</b> :( try something else?</p>");
+							}
+						});
+
+								$.getJSON(getGif, function(gifs) {
+							      for(var i = 0; i < gifs.length; i++) {
+							          $gifWindow.append('<img src=\"' + gifs[i].file + '\"\/>');
+				              		}
+				     			});
+						}
+						
 								 
-					
 					});
+					
 		//end script
 		});
 

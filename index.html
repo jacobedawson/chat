@@ -153,7 +153,7 @@
 		<!--Initial Sign-In Form-->	
 	<div id="nickWrap">
 		<p>Welcome to Mashabout...</p>
-		<img src="http://www.itshappeningnews.com/img/1388244719973.gif">
+		<img src="http://www.reactiongifs.com/r/trip1.gif">
 		<p>Choose Your Name</p>
 		<p id="nickError"></p>
 		<form id="setNick">
@@ -271,12 +271,17 @@
 			});
 
 			function displayMsg(data) {
-				var scrollPosition = $("#chat").scrollTop();
-				 var scrollHeight = $("#chat")[0].scrollHeight;
+				/*
+				 var scrollPosition = $("#chat").scrollTop();
+				 var scrollHeight = $("#chat")[0].scrollHeight();
+				 */
 					$chat.append('<span class="msg"><b>' + data.nick + ': </b>' + data.msg + "</span><br/>");
+					$chat.scrollTop($chat[0].scrollHeight);
+					/*
 				    if (scrollPosition + $chat.height() === scrollHeight) { 
 				        $chat.scrollTop(scrollHeight);       
     				}
+    				*/
 			}
 
 			socket.on('whisper', function(data) {

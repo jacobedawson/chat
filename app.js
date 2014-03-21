@@ -29,7 +29,7 @@ app.get('/', function(req, res){
 
 io.sockets.on('connection', function(socket){
 	var query = Chat.find({});
-	query.sort('-created').limit(8).exec(function(err, docs) {
+	query.sort('-created').limit(50).exec(function(err, docs) {
 		if(err) throw err;
 		socket.emit('load old msgs', docs);
 	});

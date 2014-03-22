@@ -71,7 +71,7 @@
 
 		#gif_window {
 			border: solid 1px black;
-			width: 400px;
+			width: 401px;
 			height: 600px;
 			max-height: 600px;
 			position: relative;
@@ -292,13 +292,13 @@
 			});
 
 			$gifButton.on('click',function() {
-				$('#Gif_Zone').slideToggle(300);
-				$gifButton.hide("slow");
+				$('#Gif_Zone').show(5);
+				$gifButton.hide(5);
 			});
 
 			$gifHide.on('click',function() {
-				$('#Gif_Zone').slideToggle(300);
-				$gifButton.show("slow");
+				$('#Gif_Zone').hide(5);
+				$gifButton.show(5);
 			});
 
 			

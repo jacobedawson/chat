@@ -248,7 +248,8 @@
 			});
 
 			$("#users").on("dblclick", 'p', function(event) {
-  					alert($(this).text());
+  					//alert($(this).text());
+  					$('#message').val('/w ' + $(this).text()); 
 					});
 
 
@@ -258,7 +259,8 @@
 					$chat.append('<span class="error">' + data + "</span><br/>");
 				});
 				$messageBox.val('');
-			});
+			});	
+
 
 			socket.on('load old msgs', function(docs) {
 				for(var i=docs.length-1; i >= 0; i--) {
@@ -286,6 +288,7 @@
 
 			socket.on('whisper', function(data) {
 				$chat.append('<span class="whisper"><b>' + data.nick + ': </b>' + data.msg + "</span><br/>");
+				$chat.scrollTop($chat[0].scrollHeight);
 			});
 
 			$gifButton.on('click',function() {

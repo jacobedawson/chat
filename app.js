@@ -60,6 +60,10 @@ io.sockets.on('connection', function(socket){
 				msg = '<a href=\"' + msg + '\" target=\"_blank\">' + msg + '</a>';
 			}
 			//deal with secret messages
+			/*a way to direct message with double click would be to use the double click 
+			event to fill the text box with e.g. DM> Jake: 
+			msg.substring (0,3) === 'DM> '
+			*/
 		if(msg.substring(0,3) === '/w ') {
 			msg = msg.substr(3);
 			var ind = msg.indexOf(' ');
@@ -76,17 +80,16 @@ io.sockets.on('connection', function(socket){
 				}
 			} else {
 				//handle empty msg
-				callback('That ish was empty yo');
+					callback('That ish was empty yo');	
 			}
 		} else {
 			var newMsg = new Chat({msg: msg, nick: socket.nickname});
 			newMsg.save(function(err) {
 				if(err) throw err;
+				if(msg.length == 0) { return; }
 				io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
 			});	
 		}
-
-		//append img src tags to images
 		
 
 	});

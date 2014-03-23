@@ -14,11 +14,43 @@
 	}
 
 		#chat {
-			border: 1px solid black;
 			height: 600px;
 			max-height: 600px;
 			overflow-y: auto;
-			font-family: Verdana;
+			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
+			font-size: 12px;
+		}
+
+		.date {
+			width: 100%;
+			clear: both;
+			background: honeydew;
+			position: relative;
+			font-size: 12px;
+		}
+
+		.msg {
+			font-size: 14px;
+		}
+
+
+		.msgBody {
+			background: rgba(231, 231, 231, 0.83);
+			position: relative;
+			left: 45px;
+			top: -15px;
+			padding: 10px;
+			margin: 100px 0 0.5em;
+			color: #333;
+			background: #eee;
+			-webkit-border-radius: 10px;
+			-moz-border-radius: 10px;
+			border-radius: 10px;
+			word-wrap:break-word;
+			line-height: 2.25em;
+			height: inherit;
+			width: 400;
+			margin: 0px;
 		}
 
 		#contentWrap {
@@ -59,7 +91,7 @@
 		#send-message {
 			position: relative;
 			left: 210px;
-			top: 2px;
+			top: 5px;
 			}
 
 		.submission {
@@ -82,6 +114,10 @@
 
 		#gif_window img {
 			width: 190px;
+		}
+
+		#gifPull {
+			border-radius: 2px;
 		}
 
 		#gif_search {
@@ -107,29 +143,33 @@
 		#Gif_Button {
 			width: 45px;
 			height: 160px;
+			border: 1px solid black;
 			border-radius: 5px;
 			position: relative;
-			left: 700px;
+			left: 697px;
 			bottom: 450px;
-			font-family: Verdana;
+			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
+			font-size: 12px;
 			font-weight: bold;
 		}
 
 		#Gif_Hide {
-			width: 35px;
+			width: 45px;
 			height: 160px;
 			border-radius: 5px;
+			border: 1px solid black;
 			position: relative;
-			left: 1100px;
-			bottom: 1120px;
-			font-family: Verdana;
+			left: 1102px;
+			bottom: 1093px;
+			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
 			font-size: 20px;
 			font-weight: bold;
 		}
 
 		.userNameBlock {
 			margin: 3px;
-			font-family: Verdana;
+			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
+			font-size: 12px;
 			cursor: pointer;
 		}
 
@@ -205,6 +245,12 @@
 	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+		/*var unixtime = Date.now();
+			var newDate = new Date();
+			newDate.setTime(unixtime * 1000);
+			dateString = newDate.toUTCString();
+			*/
+
 		jQuery(function($){
 			var socket = io.connect();
 			var $nickForm = $('#setNick');
@@ -220,6 +266,7 @@
 			var $clickUser = $('#clickUser');
 			var $selectChannel = $('#select_channel');
 
+			
 
 			
 			
@@ -277,7 +324,7 @@
 				 var scrollPosition = $("#chat").scrollTop();
 				 var scrollHeight = $("#chat")[0].scrollHeight();
 				 */
-					$chat.append('<span class="msg"><b>' + data.nick + ': </b>' + data.msg + "</span><br/>");
+					$chat.append(/*'<br><span class="date">' + Date.now() + '</span><br/>'+ */ '<div class="msg"><b>' + data.nick + ': </b>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 					$chat.scrollTop($chat[0].scrollHeight);
 					/*
 				    if (scrollPosition + $chat.height() === scrollHeight) { 

@@ -5,8 +5,10 @@ var express = require('express'),
 	mongoose = require('mongoose'),
 	users = {};
 	
+//ask the server to listen for action on port 3000	
 server.listen(3000);
 
+//connect to database at location, log error or log success
 mongoose.connect('mongodb://localhost/chat', function(err) {
 	if(err) {
 		console.log(err);
@@ -15,6 +17,7 @@ mongoose.connect('mongodb://localhost/chat', function(err) {
 	}
 });
 
+//create a mongoose schema
 var chatSchema = mongoose.Schema({
 	nick: String,
 	msg: String,

@@ -31,14 +31,21 @@
 
 		.msg {
 			font-size: 14px;
+			position: relative;
 		}
 
+		.msgFrom {
+			position: relative;
+			top: 16px;
+			left: 5px;
+		}
 
+		/*chat bubble*/
 		.msgBody {
 			background: rgba(231, 231, 231, 0.83);
 			position: relative;
-			left: 45px;
-			top: -15px;
+			left: 60px;
+			top: 0px;
 			padding: 10px;
 			margin: 100px 0 0.5em;
 			color: #333;
@@ -49,9 +56,24 @@
 			word-wrap:break-word;
 			line-height: 2.25em;
 			height: inherit;
-			width: 400;
+			width: 365px;
 			margin: 0px;
 		}
+
+		/*
+		.msgBody:after {
+			content: '';
+			position: relative;
+			border-style: solid;
+			border-width: 12px 15px 12px 0;
+			border-color: transparent #EFEFEF;
+			display: block;
+			width: 0;
+			z-index: 1;
+			left: -25px;
+			top: -17px;
+		}
+		*/
 
 		#contentWrap {
 			display: none;
@@ -324,7 +346,7 @@
 				 var scrollPosition = $("#chat").scrollTop();
 				 var scrollHeight = $("#chat")[0].scrollHeight();
 				 */
-					$chat.append(/*'<br><span class="date">' + Date.now() + '</span><br/>'+ */ '<div class="msg"><b>' + data.nick + ': </b>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+					$chat.append(/*'<br><span class="date">' + Date.now() + '</span><br/>'+ */ '<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 					$chat.scrollTop($chat[0].scrollHeight);
 					/*
 				    if (scrollPosition + $chat.height() === scrollHeight) { 

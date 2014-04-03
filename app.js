@@ -48,11 +48,13 @@ io.sockets.on('connection', function(socket){
 		}
 	});
 
+
+
 	function updateNicknames() {
 		io.sockets.emit('usernames', Object.keys(users));
 	}
 
-	socket.on('send message', function(data, callback){
+	socket.on('send message', function(data, pm, callback){
 		var msg = data.trim();
 			//add html tags to imgs #problem - converts all links to images, need type check somehow
 			if(msg.substring(0,7) === 'http://' && msg.substring(msg.length - 4) === '.gif') {
@@ -63,39 +65,39 @@ io.sockets.on('connection', function(socket){
 				msg = '<a href=\"' + msg + '\" target=\"_blank\">' + msg + '</a>';
 			}
 			//deal with secret messages
-			/*a way to direct message with double click would be to use the double click 
-			event to fill the text box with e.g. DM> Jake: 
-			msg.substring (0,3) === 'DM> '
-			*/
-		if(msg.substring(0,3) === '/w ') {
-			msg = msg.substr(3);
-			var ind = msg.indexOf(' ');
-			if(ind !== -1) {
-				var name = msg.substring(0, ind);
-				var msg = msg.substring(ind + 1);
-				if(name in users) {
-					users[name].emit('whisper', {msg: msg, nick: socket.nickname});
-					users[socket.nickname].emit('whisper', {msg: msg, nick: socket.nickname});
-					console.log('Whisper!');
-				} else {
-					//handle nick error
-					callback('Noo! Enter a real name yo');
+
+				var name = pm;
+
+				if(users[name] === users[socket.nickname]) {
+					users[socket.nickname].emit('error', {msg: "You just tried to message yourself lol get some sleep yo ;)", nick: socket.nickname});
+					return;
 				}
-			} else {
-				//handle empty msg
-					callback('That ish was empty yo');	
-			}
-		} else {
-			var newMsg = new Chat({msg: msg, nick: socket.nickname});
-			newMsg.save(function(err) {
-				if(err) throw err;
-				if(msg.length == 0) { return; }
+
+				if(name in users) {
+					if(msg.length == 0) { 
+						return; 
+					}
+
+					//send private message
+					users[name].emit('private', {msg: msg, nick: socket.nickname});
+					users[socket.nickname].emit('private', {msg: msg, nick: socket.nickname});
+				} else {
+					//send public message
+					var newMsg = new Chat({msg: msg, nick: socket.nickname});
+					newMsg.save(function(err) {
+						if(err) throw err;
+						if(msg.length == 0) { 
+							return; 
+					}
 				io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
 			});	
 		}
 		
 
 	});
+
+
+
 
 	socket.on('disconnect', function(data) {
 		if(!socket.nickname) return;

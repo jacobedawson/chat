@@ -93,7 +93,7 @@
 			color: red;
 		}
 
-		.whisper {
+		.private {
 			color: green;
 			font-style: italic;
 		}
@@ -195,9 +195,16 @@
 			cursor: pointer;
 		}
 
+		/*
 		.userNameBlock:hover {
 			background: darkseagreen;
 		}
+		*/
+
+		select:active {
+			background: #FFF;
+		}
+
 
 		p { 
 			font-family: Verdana;
@@ -227,7 +234,8 @@
 		<div id="contentWrap">
 
 			<div id="chatWrap">
-				<div id="users"></div>
+				<select id="users" size="25">
+				</select>
 				<div id="chat">
 				</div>	
 			</div>
@@ -294,7 +302,7 @@
 			
 
 			
-			
+			//homepage 'login' - submit name, emit to server
 			$nickForm.submit(function(e) {
 				e.preventDefault();
 				socket.emit('new user', $nickBox.val(), function(data) {
@@ -310,21 +318,30 @@
 
 			socket.on('usernames', function(data) {
 				var html = '';
+				html += '<option id="group">Group</option>';
 				for(var i = 0; i < data.length; i++) {
-					html += '<p class=\"userNameBlock\" id=\"clickUser\">' + data[i] + '</p>';
+					html += '<option class=\"userNameBlock\" id=\"clickUser\">' + data[i] + '</option>';
 				}
 				$users.html(html);
 			});
 
-			$("#users").on("dblclick", 'p', function(event) {
+			//private message grab
+			var pmTarget;
+			$("#users").on("click", 'option', function(event) {
   					//alert($(this).text());
-  					$('#message').val('/w ' + $(this).text()); 
+  					//private message grab
+  					pmTarget = $(this).text();
+  					//add class to clicked element
 					});
+
+			$('#group').on("click", 'option', function(event) {
+				pmTarget = ' ';
+			});
 
 
 			$messageForm.submit(function(e){
 				e.preventDefault();
-				socket.emit('send message', $messageBox.val(), function() {
+				socket.emit('send message', $messageBox.val(), pmTarget, function() {
 					$chat.append('<span class="error">' + data + "</span><br/>");
 				});
 				$messageBox.val('');
@@ -338,6 +355,10 @@
 			});
 			
 			socket.on('new message', function(data){
+				displayMsg(data);
+			});
+
+			socket.on('error', function(data) {
 				displayMsg(data);
 			});
 
@@ -355,8 +376,10 @@
     				*/
 			}
 
-			socket.on('whisper', function(data) {
-				$chat.append('<span class="whisper"><b>' + data.nick + ': </b>' + data.msg + "</span><br/>");
+
+			//private messaging is working to a degree. Now a visual indicator is needed.
+			socket.on('private', function(data) {
+				$chat.append('<span class="private msg"><b>' + data.nick + ': </b><div class ="msgBody">' + data.msg + "</div></span><br/>");
 				$chat.scrollTop($chat[0].scrollHeight);
 			});
 

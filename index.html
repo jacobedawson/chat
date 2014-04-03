@@ -60,6 +60,13 @@
 			margin: 0px;
 		}
 
+		.msgBody img {
+			max-width:100%; 
+			max-height:100%;
+			margin:auto;
+			display:block;
+		}
+
 		/*
 		.msgBody:after {
 			content: '';
@@ -210,6 +217,11 @@
 			font-family: Verdana;
 		}
 
+		.pmError {
+			color: red;
+			font-style: italic;
+		}
+
 	</style>
 
 	<title>Mashabout</title>
@@ -358,28 +370,26 @@
 				displayMsg(data);
 			});
 
+			
+			function displayMsg(data) {
+					$chat.append('<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+					$chat.scrollTop($chat[0].scrollHeight);
+			}
+
+			//error message if someone private messages themselves
 			socket.on('error', function(data) {
-				displayMsg(data);
+				displayErr(data);
 			});
 
-			function displayMsg(data) {
-				/*
-				 var scrollPosition = $("#chat").scrollTop();
-				 var scrollHeight = $("#chat")[0].scrollHeight();
-				 */
-					$chat.append(/*'<br><span class="date">' + Date.now() + '</span><br/>'+ */ '<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+			function displayErr(data) {
+					$chat.append('<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody pmError">' + data.msg + '</div>' + "</div><br/>");
 					$chat.scrollTop($chat[0].scrollHeight);
-					/*
-				    if (scrollPosition + $chat.height() === scrollHeight) { 
-				        $chat.scrollTop(scrollHeight);       
-    				}
-    				*/
 			}
 
 
-			//private messaging is working to a degree. Now a visual indicator is needed.
+			//private messaging 
 			socket.on('private', function(data) {
-				$chat.append('<span class="private msg"><b>' + data.nick + ': </b><div class ="msgBody">' + data.msg + "</div></span><br/>");
+				$chat.append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 				$chat.scrollTop($chat[0].scrollHeight);
 			});
 

@@ -69,7 +69,7 @@ io.sockets.on('connection', function(socket){
 				var name = pm;
 
 				if(users[name] === users[socket.nickname]) {
-					users[socket.nickname].emit('error', {msg: "You just tried to message yourself lol get some sleep yo ;)", nick: socket.nickname});
+					users[socket.nickname].emit('error', {msg: "lol u just tried 2 message urself haha get some sleep yo ;)", nick: socket.nickname});
 					return;
 				}
 

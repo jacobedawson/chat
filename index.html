@@ -17,10 +17,26 @@
 			height: 600px;
 			max-height: 600px;
 			overflow-y: auto;
+			overflow-x: hidden;
 			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
 			font-size: 12px;
 		}
 
+		/*Private Chat Tab*/
+		.privateChatTab {
+			height: 600px;
+			max-height: 600px;
+			width: 300px;
+			overflow-y: auto;
+			overflow-x: hidden;
+			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
+			font-size: 12px;
+			border: 1px solid black;
+			position: absolute;
+			left: 10px;
+			top: 10px;
+		}
+		
 		.date {
 			width: 100%;
 			clear: both;
@@ -249,7 +265,8 @@
 				<select id="users" size="25">
 				</select>
 				<div id="chat">
-				</div>	
+				</div>
+				
 			</div>
 
 				<form id="send-message" >
@@ -275,6 +292,10 @@
 
 					<button id="Gif_Button">Gifs</button>
 
+					<!--First attempt at new chat tab-->	
+					<div class="privateChatTab">
+						<p>Example New Tab</p>
+					</div>
 
 		</div>
 		</div>
@@ -307,6 +328,8 @@
 			var $gifHide = $('#Gif_Hide');
 			var $clickUser = $('#clickUser');
 			var $selectChannel = $('#select_channel');
+			var pmTarget;
+			var $pmWindow = $('#' + pmTarget);
 
 			
 
@@ -338,23 +361,23 @@
 			});
 
 			//private message grab
-			var pmTarget;
+			
 			$("#users").on("click", 'option', function(event) {
   					//alert($(this).text());
   					//private message grab
   					pmTarget = $(this).text();
-  					//add class to clicked element
+  					$('.privateChatTab').attr('id', pmTarget);
 					});
-
+			//if group is clicked, the message is to the whole group
 			$('#group').on("click", 'option', function(event) {
 				pmTarget = ' ';
 			});
 
-
+			//this essentially makes every message either group or private, with group the default
 			$messageForm.submit(function(e){
 				e.preventDefault();
 				socket.emit('send message', $messageBox.val(), pmTarget, function() {
-					$chat.append('<span class="error">' + data + "</span><br/>");
+
 				});
 				$messageBox.val('');
 			});	
@@ -366,15 +389,28 @@
 				}
 			});
 			
+			//general messaging function
 			socket.on('new message', function(data){
 				displayMsg(data);
 			});
 
-			
+			//public messaging 
 			function displayMsg(data) {
 					$chat.append('<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 					$chat.scrollTop($chat[0].scrollHeight);
 			}
+
+			//private messaging 
+			socket.on('private', function(data) {
+				displayPM(data);
+			});
+
+			function displayPM(data) {
+				//temporarily switching '$chat' to $alex
+				$('#' + pmTarget).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+				$('#' + pmTarget).scrollTop($chat[0].scrollHeight);
+			}
+
 
 			//error message if someone private messages themselves
 			socket.on('error', function(data) {
@@ -386,13 +422,8 @@
 					$chat.scrollTop($chat[0].scrollHeight);
 			}
 
-
-			//private messaging 
-			socket.on('private', function(data) {
-				$chat.append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
-				$chat.scrollTop($chat[0].scrollHeight);
-			});
-
+			
+			//gifsearch area
 			$gifButton.on('click',function() {
 				$('#Gif_Zone').show(5);
 				$gifButton.hide(5);
@@ -404,7 +435,7 @@
 			});
 
 			
-			//Gif Search 
+			//Gif Search functionality
 			var $gifsearch = $('#gif_search');
 
 

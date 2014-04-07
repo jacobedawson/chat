@@ -3,6 +3,7 @@ var express = require('express'),
 	server = require('http').createServer(app),
 	io = require('socket.io').listen(server),
 	mongoose = require('mongoose'),
+	// usernames which are currently connected to the chat
 	users = {};
 	
 //ask the server to listen for action on port 3000	
@@ -25,7 +26,7 @@ var chatSchema = mongoose.Schema({
 });
 
 var Chat = mongoose.model('Message', chatSchema);
-
+// routing
 app.get('/', function(req, res){
 	res.sendfile(__dirname + '/index.html');
 });

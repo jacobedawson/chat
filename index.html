@@ -37,6 +37,15 @@
 			top: 10px;
 		}
 		
+		.testTab {
+			height: 200px;
+			width: 200px;
+			position: absolute;
+			top:10px;
+			right:10px;
+			border: solid 1px black;
+		}
+
 		.date {
 			width: 100%;
 			clear: both;
@@ -360,18 +369,20 @@
 				$users.html(html);
 			});
 
-			//private message grab
-			
+			//private message grab	
 			$("#users").on("click", 'option', function(event) {
   					//alert($(this).text());
   					//private message grab
   					pmTarget = $(this).text();
   					$('.privateChatTab').attr('id', pmTarget);
 					});
+
 			//if group is clicked, the message is to the whole group
 			$('#group').on("click", 'option', function(event) {
 				pmTarget = ' ';
 			});
+
+		
 
 			//this essentially makes every message either group or private, with group the default
 			$messageForm.submit(function(e){
@@ -407,8 +418,8 @@
 
 			function displayPM(data) {
 				//temporarily switching '$chat' to $alex
-				$('#' + pmTarget).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
-				$('#' + pmTarget).scrollTop($chat[0].scrollHeight);
+				$('.privateChatTab').append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+				$('.privateChatTab').scrollTop($chat[0].scrollHeight);
 			}
 
 

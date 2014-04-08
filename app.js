@@ -4,7 +4,8 @@ var express = require('express'),
 	io = require('socket.io').listen(server),
 	mongoose = require('mongoose'),
 	// usernames which are currently connected to the chat
-	users = {};
+	users = {},
+	rooms = {};
 	
 //ask the server to listen for action on port 3000	
 server.listen(3000);
@@ -48,6 +49,8 @@ io.sockets.on('connection', function(socket){
 			updateNicknames();
 		}
 	});
+
+
 
 
 

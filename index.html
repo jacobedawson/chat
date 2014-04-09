@@ -2,6 +2,10 @@
 <head>
 	<style type="text/css">
 
+	body {
+		font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
+	}
+
 	#container {
 		width: 900px;
 		margin: auto;
@@ -18,7 +22,6 @@
 			max-height: 600px;
 			overflow-y: auto;
 			overflow-x: hidden;
-			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
 			font-size: 12px;
 		}
 
@@ -26,10 +29,9 @@
 		.privateChatTab {
 			height: 600px;
 			max-height: 600px;
-			width: 300px;
+			width: 480px;
 			overflow-y: auto;
 			overflow-x: hidden;
-			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
 			font-size: 12px;
 			border: 1px solid black;
 			position: absolute;
@@ -130,15 +132,24 @@
 			font-style: italic;
 		}
 
+		/* Name Box */
+		#myChat {
+			width: 198px;
+			height: 20px;
+			position: absolute;
+			right: 500px;
+			border: solid 1px black;
+			top: -1px;
+		}
 
-
+		/* Online Users */
 		#users {
 			width: 200px;
 			position: absolute;
 			right: 500px;
 			border: solid 1px black;
-			top: -1px;
-			height: 100%;
+			top: 25px;
+			height: 576px;
 			overflow-y: auto;
 		}
 
@@ -200,9 +211,8 @@
 			border: 1px solid black;
 			border-radius: 5px;
 			position: relative;
-			left: 697px;
+			left: 700px;
 			bottom: 450px;
-			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
 			font-size: 12px;
 			font-weight: bold;
 		}
@@ -215,14 +225,12 @@
 			position: relative;
 			left: 1102px;
 			bottom: 1093px;
-			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
 			font-size: 20px;
 			font-weight: bold;
 		}
 
 		.userNameBlock {
 			margin: 3px;
-			font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;
 			font-size: 12px;
 			cursor: pointer;
 		}
@@ -252,6 +260,14 @@
 			background: rgb(255, 187, 0);
 		}
 
+		/* First Attempt At Tabs*/
+		#tabs {
+			 width: 95%;
+			 margin-left: auto;
+			 margin-right: auto;
+			 margin-top: 10px;
+		}
+		/*End First Attempt*/
 	</style>
 
 	<title>Mashabout</title>
@@ -276,8 +292,10 @@
 		<div id="contentWrap">
 
 			<div id="chatWrap">
+				<div id="myChat"></div>
 				<select id="users" size="25">
 				</select>
+				<!-- Chat Window-->
 				<div id="chat">
 				</div>
 				
@@ -308,7 +326,22 @@
 
 					<!--First attempt at new chat tab-->	
 					<div class="privateChatTab">
-						<p>Example New Tab</p>
+						<!--First Attempt At Adding Dynamic Tabs-->
+							<ul>
+						        <li><a href="#tabs-1">Tab 1</a></li>
+						        <li><a href="#tabs-2">Tab 2</a></li>
+						        <li><a href="#tabs-3">Tab 3</a></li>
+						    </ul>
+						    <div id="tabs-1">
+						        <p>Content for Tab 1</p>
+						    </div>
+						    <div id="tabs-2">
+						        <p>Content for Tab 2</p>
+						    </div>
+						    <div id="tabs-3">
+						        <p>Content for Tab 3</p>
+						    </div>
+						<!--First Attempt At Adding Dynamic Tabs-->
 					</div>
 
 		</div>
@@ -341,22 +374,18 @@
 			var $gifButton = $('#Gif_Button');
 			var $gifHide = $('#Gif_Hide');
 			var $selectChannel = $('#select_channel');
+			var $myChat = $('#myChat');
 			var pmTarget;
 			var $pmWindow = $('#' + pmTarget);
 			//to capture who client is
-			var whoAmI = [];
-
-			
-
-			
-			
+			var whoAmI;
 
 			
 			//homepage 'login' - submit name, emit to server
 			$nickForm.submit(function(e) {
 				e.preventDefault();
 				//add new user to array
-				whoAmI.push($nickBox.val());
+				whoAmI = $nickBox.val();
 				socket.emit('new user', $nickBox.val(), function(data) {
 					if(data) {
 						$('#nickWrap').hide();
@@ -370,7 +399,8 @@
 
 			socket.on('usernames', function(data) {
 				var html = '';
-				html += '<option id="group">Group</option>';
+				$myChat.html(whoAmI + '\'s Posse');
+				html += '<option id="group">Msg Everyone</option>';
 				for(var i = 0; i < data.length; i++) {
 					if(data[i] == whoAmI) {
 						$users.html(html);
@@ -395,6 +425,11 @@
 			$('#group').on("click", 'option', function(event) {
 				pmTarget = ' ';
 			});
+
+
+			//First Attempt At Dynamic Tabs
+				$("#tabs").tabs();
+			//End First Attempt
 
 		
 
@@ -441,7 +476,7 @@
 
 			//remove notification
 			$('#users').on('click', 'option', function() {
-				$(this).removeClass('notification');
+				$(this).siblings().removeClass('notification');
 			});
 
 			function displayPM(data) {
@@ -481,6 +516,7 @@
 
 				$gifsearch.submit(function(e){
 						e.preventDefault();
+						$gifWindow.empty();
 						if($selectChannel.val() == 'giphy') {
 							//Giphy.com
 								//we are now pulling the search query into the URL and grabbing a JSON object
@@ -498,7 +534,7 @@
 
 						$.getJSON(getGif,function(json) {
 							if (json.length == 0) {
-								$gifWindow.append("<p>ReplyGif doesn't have the tag <b>\'" + $('#gifPull').val() + "\'</b> :( try something else?</p>");
+								$gifWindow.append("<img src=\"http://i6.photobucket.com/albums/y215/Zalc/Gifs/supersad.gif\"/><p>Lame. ReplyGif doesn't have the tag <b>\'" + $('#gifPull').val() + "\'</b><br/>Try something else or just give up?</p>");
 							}
 						});
 

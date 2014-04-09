@@ -247,6 +247,11 @@
 			font-style: italic;
 		}
 
+		/*Notification Highlighting*/
+		.notification {
+			background: rgb(255, 187, 0);
+		}
+
 	</style>
 
 	<title>Mashabout</title>
@@ -335,10 +340,11 @@
 			var $gifWindow = $('#gif_window');
 			var $gifButton = $('#Gif_Button');
 			var $gifHide = $('#Gif_Hide');
-			var $clickUser = $('#clickUser');
 			var $selectChannel = $('#select_channel');
 			var pmTarget;
 			var $pmWindow = $('#' + pmTarget);
+			//to capture who client is
+			var whoAmI = [];
 
 			
 
@@ -349,6 +355,8 @@
 			//homepage 'login' - submit name, emit to server
 			$nickForm.submit(function(e) {
 				e.preventDefault();
+				//add new user to array
+				whoAmI.push($nickBox.val());
 				socket.emit('new user', $nickBox.val(), function(data) {
 					if(data) {
 						$('#nickWrap').hide();
@@ -364,9 +372,13 @@
 				var html = '';
 				html += '<option id="group">Group</option>';
 				for(var i = 0; i < data.length; i++) {
-					html += '<option class=\"userNameBlock\" id=\"clickUser\">' + data[i] + '</option>';
+					if(data[i] == whoAmI) {
+						$users.html(html);
+					} else {
+					html += '<option class=\"userNameBlock\" id=\"' + data[i] + '\">' + data[i] + '</option>';
 				}
 				$users.html(html);
+				};
 			});
 
 			//private message grab	
@@ -376,6 +388,8 @@
   					pmTarget = $(this).text();
   					$('.privateChatTab').attr('id', pmTarget);
 					});
+
+
 
 			//if group is clicked, the message is to the whole group
 			$('#group').on("click", 'option', function(event) {
@@ -414,12 +428,27 @@
 			//private messaging 
 			socket.on('private', function(data) {
 				displayPM(data);
+				/* 
+					if(data.nick == $().val()) {
+						something
+					} else {
+						add notification highlighting
+					}
+				*/
+				//add notification highlighting
+				$('#' + data.nick).addClass('notification');
+			});
+
+			//remove notification
+			$('#users').on('click', 'option', function() {
+				$(this).removeClass('notification');
 			});
 
 			function displayPM(data) {
 				//temporarily switching '$chat' to $alex
 				$('.privateChatTab').append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 				$('.privateChatTab').scrollTop($chat[0].scrollHeight);
+				
 			}
 
 

@@ -1,5 +1,6 @@
 <html>
 <head>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/base/jquery-ui.css"/>
 	<style type="text/css">
 
 	body {
@@ -223,7 +224,7 @@
 			border-radius: 5px;
 			border: 1px solid black;
 			position: relative;
-			left: 1102px;
+			left: 1105px;
 			bottom: 1093px;
 			font-size: 20px;
 			font-weight: bold;
@@ -262,10 +263,11 @@
 
 		/* First Attempt At Tabs*/
 		#tabs {
-			 width: 95%;
+			 width: 100%;
 			 margin-left: auto;
 			 margin-right: auto;
-			 margin-top: 10px;
+			 margin-top: 0px;
+			 height: 594px;
 		}
 		/*End First Attempt*/
 	</style>
@@ -327,20 +329,13 @@
 					<!--First attempt at new chat tab-->	
 					<div class="privateChatTab">
 						<!--First Attempt At Adding Dynamic Tabs-->
-							<ul>
-						        <li><a href="#tabs-1">Tab 1</a></li>
-						        <li><a href="#tabs-2">Tab 2</a></li>
-						        <li><a href="#tabs-3">Tab 3</a></li>
-						    </ul>
-						    <div id="tabs-1">
-						        <p>Content for Tab 1</p>
-						    </div>
-						    <div id="tabs-2">
-						        <p>Content for Tab 2</p>
-						    </div>
-						    <div id="tabs-3">
-						        <p>Content for Tab 3</p>
-						    </div>
+							<div id="tabs">
+							    <ul>
+
+							    </ul>
+
+							</div>
+
 						<!--First Attempt At Adding Dynamic Tabs-->
 					</div>
 
@@ -379,6 +374,10 @@
 			var $pmWindow = $('#' + pmTarget);
 			//to capture who client is
 			var whoAmI;
+			//First Attempt At Dynamic Tabs
+			var tabs = $( "#tabs" ).tabs();
+			var ul = tabs.find( "ul" );
+			//End First Attempt
 
 			
 			//homepage 'login' - submit name, emit to server
@@ -417,6 +416,8 @@
   					//private message grab
   					pmTarget = $(this).text();
   					$('.privateChatTab').attr('id', pmTarget);
+  					//grab pmTarget and insert into tabs
+
 					});
 
 
@@ -427,9 +428,7 @@
 			});
 
 
-			//First Attempt At Dynamic Tabs
-				$("#tabs").tabs();
-			//End First Attempt
+
 
 		
 
@@ -463,29 +462,55 @@
 			//private messaging 
 			socket.on('private', function(data) {
 				displayPM(data);
-				/* 
-					if(data.nick == $().val()) {
-						something
-					} else {
-						add notification highlighting
-					}
-				*/
+
 				//add notification highlighting
 				$('#' + data.nick).addClass('notification');
 			});
 
+			var catchName = '';
 			//remove notification
 			$('#users').on('click', 'option', function() {
 				$(this).siblings().removeClass('notification');
+				catchName = $(this).html();
+				if ($('#tab' + catchName).length == 0) {
+					if(catchName == 'Msg Everyone') {
+						return
+					} else {
+						$( '<li id=\"' + "tab" + catchName + '\"' + "><a href='#" + catchName + "'>" + catchName + "</a></li>" ).appendTo(ul);
+					}
+					
+				};
+
 			});
 
 			function displayPM(data) {
-				//temporarily switching '$chat' to $alex
-				$('.privateChatTab').append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+				//if there is already a tab with a certain id
+				 
+
+				//if the tab has no name
+				if(catchName == '') {
+					//give it a name
+					catchName = data.nick;
+					$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").appendTo(tabs);
+					
+				} else {
+					//tab logic
+
+
+					$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").appendTo(tabs);
+				}
+				
+				tabs.tabs( "refresh" );
+
+				//now trying to insert private messages to tabs
+				//private messages can be appended anywhere
+				//the trick is to make this first selector dynamic
+				/*$('.privateChatTab').append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");*/
 				$('.privateChatTab').scrollTop($chat[0].scrollHeight);
 				
 			}
 
+			catchName = '';
 
 			//error message if someone private messages themselves
 			socket.on('error', function(data) {

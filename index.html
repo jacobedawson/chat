@@ -26,7 +26,7 @@
 			font-size: 12px;
 		}
 
-		/*Private Chat Tab*/
+		/*Private Chat Tab
 		.privateChatTab {
 			height: 600px;
 			max-height: 600px;
@@ -39,6 +39,7 @@
 			left: 10px;
 			top: 10px;
 		}
+		*/
 		
 		.testTab {
 			height: 200px;
@@ -60,6 +61,7 @@
 		.msg {
 			font-size: 14px;
 			position: relative;
+			margin-bottom: 15px;
 		}
 
 		.msgFrom {
@@ -263,11 +265,21 @@
 
 		/* First Attempt At Tabs*/
 		#tabs {
-			 width: 100%;
+			 height: 600px;
+			 max-height: 600px;
+			 width: 495px;
 			 margin-left: auto;
 			 margin-right: auto;
 			 margin-top: 0px;
-			 height: 594px;
+			 overflow: hidden;
+		}
+
+		#chatTabPrivate {
+			height: 600px;
+			max-height: 600px;
+			width: 495px;
+			overflow:scroll;
+			padding-bottom: 20px;
 		}
 		/*End First Attempt*/
 	</style>
@@ -278,8 +290,10 @@
 
 <body>
 
-	<div id="container">
+	<div id="container"> <!-- Try to Find Closing Tag-->
 		<!--Initial Sign-In Form-->	
+
+	<!--nickWrap Opening Page-->
 	<div id="nickWrap">
 		<p>Welcome to Mashabout...</p>
 		<img src="http://www.reactiongifs.com/r/trip1.gif">
@@ -290,9 +304,11 @@
 			<input type="submit"></input>
 		</form>	
 	</div>
+
 		<!--Chat Page Seen Upon Sign-In-->	
 		<div id="contentWrap">
 
+			<!--Main Chat Section-->
 			<div id="chatWrap">
 				<div id="myChat"></div>
 				<select id="users" size="25">
@@ -303,11 +319,15 @@
 				
 			</div>
 
+
+
+				<!--Send Message Input Section-->
 				<form id="send-message" >
 						<input size="65" id="message" class="submission" placeholder="Type something, drag a gif or add a link here yo"></input>
 						<input type="submit"></input>
 				</form>
 
+					<!--Gif Search Section-->
 					<div id="Gif_Zone">
 						<form id="gif_search">
 							<select id="select_channel">
@@ -326,21 +346,28 @@
 
 					<button id="Gif_Button">Gifs</button>
 
-					<!--First attempt at new chat tab-->	
-					<div class="privateChatTab">
+						<!--First attempt at new chat tab-->	
+					<!--<div class="privateChatTab">-->
 						<!--First Attempt At Adding Dynamic Tabs-->
 							<div id="tabs">
 							    <ul>
-
 							    </ul>
-
+							    <div id="chatTabPrivate">
+							    </div>
 							</div>
+							
 
 						<!--First Attempt At Adding Dynamic Tabs-->
-					</div>
+					
+					<!--</div>-->
 
-		</div>
-		</div>
+					</div><!--Content Wrap Div Closing Tag -->
+
+				
+
+				</div><!--Container Div Closing Tag -->
+
+				
 
 
 
@@ -349,6 +376,8 @@
 	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
+
+	<!--Front-End Logic-->
 	<script>
 		/*var unixtime = Date.now();
 			var newDate = new Date();
@@ -378,6 +407,7 @@
 			var tabs = $( "#tabs" ).tabs();
 			var ul = tabs.find( "ul" );
 			//End First Attempt
+			var chatTabPrivate = $('#chatTabPrivate');
 
 			
 			//homepage 'login' - submit name, emit to server
@@ -412,12 +442,12 @@
 
 			//private message grab	
 			$("#users").on("click", 'option', function(event) {
-  					//alert($(this).text());
   					//private message grab
   					pmTarget = $(this).text();
+  					/*
+  					the following code gives the privateChatTab the id of 'name', which is kind of useless
   					$('.privateChatTab').attr('id', pmTarget);
-  					//grab pmTarget and insert into tabs
-
+					*/
 					});
 
 
@@ -491,13 +521,13 @@
 				if(catchName == '') {
 					//give it a name
 					catchName = data.nick;
-					$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").appendTo(tabs);
+					$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").appendTo(chatTabPrivate);
 					
 				} else {
 					//tab logic
 
 
-					$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").appendTo(tabs);
+					$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").appendTo(chatTabPrivate);
 				}
 				
 				tabs.tabs( "refresh" );

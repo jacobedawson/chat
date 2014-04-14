@@ -274,12 +274,19 @@
 			 overflow: hidden;
 		}
 
-		#chatTabPrivate {
+		#tabs > ul {
+		}
+
+		.chatTabPrivate {
 			height: 600px;
 			max-height: 600px;
-			width: 495px;
-			overflow:scroll;
+			width: 502px;
+			overflow: scroll;
 			padding-bottom: 20px;
+			position: absolute;
+			top: 51px;
+			left: -1px;
+			border: 1px solid black;
 		}
 		/*End First Attempt*/
 	</style>
@@ -352,8 +359,7 @@
 							<div id="tabs">
 							    <ul>
 							    </ul>
-							    <div id="chatTabPrivate">
-							    </div>
+							    
 							</div>
 							
 
@@ -429,6 +435,8 @@
 			socket.on('usernames', function(data) {
 				var html = '';
 				$myChat.html(whoAmI + '\'s Posse');
+				//create pm div here?
+
 				html += '<option id="group">Msg Everyone</option>';
 				for(var i = 0; i < data.length; i++) {
 					if(data[i] == whoAmI) {
@@ -438,6 +446,14 @@
 				}
 				$users.html(html);
 				};
+				for(var i = 0; i < data.length; i++) {
+				if ($('#pmMsgBox' + data[i]).length == 0)
+				{$('<div id=\"' + 'pmMsgBox' + data[i] + '\"' + 'class=\"' + 'chatTabPrivate' + '\"' + '></div>').appendTo(tabs);}
+				if(data[i] == whoAmI) {
+					$('#pmMsgBox' + data[i]).css('display', 'none');
+				} 
+				};
+
 			});
 
 			//private message grab	
@@ -487,6 +503,7 @@
 			function displayMsg(data) {
 					$chat.append('<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 					$chat.scrollTop($chat[0].scrollHeight);
+
 			}
 
 			//private messaging 
@@ -495,13 +512,16 @@
 
 				//add notification highlighting
 				$('#' + data.nick).addClass('notification');
+				$('#pmMsgBox' + data.nick).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 			});
 
 			var catchName = '';
+			var divName;
 			//remove notification
 			$('#users').on('click', 'option', function() {
-				$(this).siblings().removeClass('notification');
+				$(this).removeClass('notification');
 				catchName = $(this).html();
+				divName = $(this).html();
 				if ($('#tab' + catchName).length == 0) {
 					if(catchName == 'Msg Everyone') {
 						return
@@ -516,20 +536,18 @@
 			function displayPM(data) {
 				//if there is already a tab with a certain id
 				 
-
 				//if the tab has no name
 				if(catchName == '') {
 					//give it a name
 					catchName = data.nick;
-					$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").appendTo(chatTabPrivate);
+					/*$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").html($('pmMsgBox' + catchName));*/
+					$('#pmMsgBox' + divName).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 					
 				} else {
 					//tab logic
-
-
-					$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").appendTo(chatTabPrivate);
+					/*$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").html($('pmMsgBox' + catchName));*/
+					$('#pmMsgBox' + divName).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 				}
-				
 				tabs.tabs( "refresh" );
 
 				//now trying to insert private messages to tabs

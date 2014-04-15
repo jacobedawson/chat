@@ -558,6 +558,16 @@
 				
 			}
 
+				//toggle content divs (still in progress)
+				//currently '$this' is the entire a href tag
+				var tabName = ' ';
+					$("#tabs").on('click', 'li', function(event) {
+						alert($(this).html());
+						tabName = $(this).html();
+
+						$('#pmMsgBox' + tabName).toggle();
+					});
+
 			catchName = '';
 
 			//error message if someone private messages themselves

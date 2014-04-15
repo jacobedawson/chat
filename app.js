@@ -83,8 +83,8 @@ io.sockets.on('connection', function(socket){
 					}
 
 					//send private message
-					users[name].emit('private', {msg: msg, nick: socket.nickname});
-					users[socket.nickname].emit('private', {msg: msg, nick: socket.nickname});
+					users[name].emit('private', {msg: msg, nick: socket.nickname, to: pm});
+					users[socket.nickname].emit('private', {msg: msg, nick: socket.nickname, to: pm});
 				} else {
 					//send public message
 					var newMsg = new Chat({msg: msg, nick: socket.nickname});
@@ -93,7 +93,7 @@ io.sockets.on('connection', function(socket){
 						if(msg.length == 0) { 
 							return; 
 					}
-				io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
+				io.sockets.emit('new message', {msg: msg, nick: socket.nickname, to: pm});
 			});	
 		}
 		

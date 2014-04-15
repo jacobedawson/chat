@@ -18,7 +18,7 @@
 		text-align: center;
 	}
 
-		#chat {
+		#msgBoxGroup {
 			height: 600px;
 			max-height: 600px;
 			overflow-y: auto;
@@ -26,20 +26,13 @@
 			font-size: 12px;
 		}
 
-		/*Private Chat Tab
-		.privateChatTab {
+		.chatTabPrivate {
 			height: 600px;
 			max-height: 600px;
-			width: 480px;
 			overflow-y: auto;
 			overflow-x: hidden;
 			font-size: 12px;
-			border: 1px solid black;
-			position: absolute;
-			left: 10px;
-			top: 10px;
 		}
-		*/
 		
 		.testTab {
 			height: 200px;
@@ -263,32 +256,10 @@
 			background: rgb(255, 187, 0);
 		}
 
-		/* First Attempt At Tabs*/
-		#tabs {
-			 height: 600px;
-			 max-height: 600px;
-			 width: 495px;
-			 margin-left: auto;
-			 margin-right: auto;
-			 margin-top: 0px;
-			 overflow: hidden;
-		}
 
-		#tabs > ul {
-		}
 
-		.chatTabPrivate {
-			height: 600px;
-			max-height: 600px;
-			width: 502px;
-			overflow: scroll;
-			padding-bottom: 20px;
-			position: absolute;
-			top: 51px;
-			left: -1px;
-			border: 1px solid black;
-		}
-		/*End First Attempt*/
+
+
 	</style>
 
 	<title>Mashabout</title>
@@ -321,7 +292,10 @@
 				<select id="users" size="25">
 				</select>
 				<!-- Chat Window-->
-				<div id="chat">
+				<div id="chatWindow">
+					<!-- begin big adventure...-->
+				<div id="msgBoxGroup" class="chatTabPrivate">
+				</div>
 				</div>
 				
 			</div>
@@ -352,18 +326,6 @@
 					</div>
 
 					<button id="Gif_Button">Gifs</button>
-
-						<!--First attempt at new chat tab-->	
-					<!--<div class="privateChatTab">-->
-						<!--First Attempt At Adding Dynamic Tabs-->
-							<div id="tabs">
-							    <ul>
-							    </ul>
-							    
-							</div>
-							
-
-						<!--First Attempt At Adding Dynamic Tabs-->
 					
 					<!--</div>-->
 
@@ -399,7 +361,8 @@
 			var $users = $('#users');
 			var $messageForm = $('#send-message');
 			var $messageBox = $('#message');
-			var $chat = $('#chat');
+			var $chat = $('#msgBoxGroup');
+			var $chatWindow = $('#chatWindow');
 			var $gifWindow = $('#gif_window');
 			var $gifButton = $('#Gif_Button');
 			var $gifHide = $('#Gif_Hide');
@@ -409,9 +372,7 @@
 			var $pmWindow = $('#' + pmTarget);
 			//to capture who client is
 			var whoAmI;
-			//First Attempt At Dynamic Tabs
-			var tabs = $( "#tabs" ).tabs();
-			var ul = tabs.find( "ul" );
+
 			//End First Attempt
 			var chatTabPrivate = $('#chatTabPrivate');
 
@@ -437,7 +398,7 @@
 				$myChat.html(whoAmI + '\'s Posse');
 				//create pm div here?
 
-				html += '<option id="group">Msg Everyone</option>';
+				html += '<option id="group">Group</option>';
 				for(var i = 0; i < data.length; i++) {
 					if(data[i] == whoAmI) {
 						$users.html(html);
@@ -446,11 +407,14 @@
 				}
 				$users.html(html);
 				};
+				//Create a PM Div for each user
 				for(var i = 0; i < data.length; i++) {
-				if ($('#pmMsgBox' + data[i]).length == 0)
-				{$('<div id=\"' + 'pmMsgBox' + data[i] + '\"' + 'class=\"' + 'chatTabPrivate' + '\"' + '></div>').appendTo(tabs);}
+					//only if it doesn't yet exist
+				if ($('#msgBox' + data[i]).length == 0)
+				{$('<div id=\"' + 'msgBox' + data[i] + '\"' + 'class=\"' + 'chatTabPrivate' + '\"' + '></div>').appendTo($(chatWindow));}
+				//if the user is 'self', remove the new div so that only 3rd party divs remain
 				if(data[i] == whoAmI) {
-					$('#pmMsgBox' + data[i]).css('display', 'none');
+					$('#msgBox' + data[i]).remove();
 				} 
 				};
 
@@ -460,10 +424,6 @@
 			$("#users").on("click", 'option', function(event) {
   					//private message grab
   					pmTarget = $(this).text();
-  					/*
-  					the following code gives the privateChatTab the id of 'name', which is kind of useless
-  					$('.privateChatTab').attr('id', pmTarget);
-					*/
 					});
 
 
@@ -497,6 +457,9 @@
 			//general messaging function
 			socket.on('new message', function(data){
 				displayMsg(data);
+				if(data.to == 'Group') {
+					$('#group').addClass('notification');
+				};
 			});
 
 			//public messaging 
@@ -512,63 +475,37 @@
 
 				//add notification highlighting
 				$('#' + data.nick).addClass('notification');
-				$('#pmMsgBox' + data.nick).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+				
 			});
 
-			var catchName = '';
-			var divName;
+
 			//remove notification
 			$('#users').on('click', 'option', function() {
 				$(this).removeClass('notification');
-				catchName = $(this).html();
-				divName = $(this).html();
-				if ($('#tab' + catchName).length == 0) {
-					if(catchName == 'Msg Everyone') {
-						return
-					} else {
-						$( '<li id=\"' + "tab" + catchName + '\"' + "><a href='#" + catchName + "'>" + catchName + "</a></li>" ).appendTo(ul);
-					}
-					
-				};
-
 			});
 
-			function displayPM(data) {
-				//if there is already a tab with a certain id
-				 
-				//if the tab has no name
-				if(catchName == '') {
-					//give it a name
-					catchName = data.nick;
-					/*$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").html($('pmMsgBox' + catchName));*/
-					$('#pmMsgBox' + divName).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
-					
-				} else {
-					//tab logic
-					/*$('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>").html($('pmMsgBox' + catchName));*/
-					$('#pmMsgBox' + divName).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
-				}
-				tabs.tabs( "refresh" );
+			//remove notification
 
-				//now trying to insert private messages to tabs
-				//private messages can be appended anywhere
-				//the trick is to make this first selector dynamic
-				/*$('.privateChatTab').append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");*/
+			function displayPM(data) {
+
+				$('#msgBox' + data.to).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+				$('#msgBox' + data.nick).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+
+
 				$('.privateChatTab').scrollTop($chat[0].scrollHeight);
 				
 			}
 
 				//toggle content divs (still in progress)
 				//currently '$this' is the entire a href tag
-				var tabName = ' ';
-					$("#tabs").on('click', 'li', function(event) {
-						alert($(this).html());
-						tabName = $(this).html();
-
-						$('#pmMsgBox' + tabName).toggle();
+					$("#users").on('click', 'option', function(event) {
+						var tabName = $(this).html();
+						//$('#pmMsgBox' + tabName).siblings().toggle();
+						$('.chatTabPrivate').not($('#msgBox' + tabName)).hide();
+						$('#msgBox' + tabName).show();
 					});
 
-			catchName = '';
+
 
 			//error message if someone private messages themselves
 			socket.on('error', function(data) {

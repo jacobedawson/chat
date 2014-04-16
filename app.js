@@ -5,7 +5,16 @@ var express = require('express'),
 	mongoose = require('mongoose'),
 	// usernames which are currently connected to the chat
 	users = {};
+
+	//connecting to Modulus database
+	/*var db = mongoose.createConnection(
+		'mongodb://<user>:<pass>@novus.modulusmongo.net:27017/puvE7muz'
+		);*/
+
 	
+	//use environmental variable PORT (for Modulus)
+	/*app.listen(process.env.PORT || 3000);*/
+
 	//express compress middleware
 	app.use(express.compress());
 
@@ -13,9 +22,14 @@ var express = require('express'),
 	app.use(express.static(__dirname + '/public'));
 
 //ask the server to listen for action on port 3000	
+/*
+Changing this for Modulus, return if not working
+server.listen(process.env.PORT || 3000);
+*/
 server.listen(3000);
-
 //connect to database at location, log error or log success
+//following line edited for modulus testing, can be wound back
+/*mongoose.connect('mongodb://root:bamboo@novus.modulusmongo.net:27017/puvE7muz', function(err) {*/
 mongoose.connect('mongodb://localhost/chat', function(err) {
 	if(err) {
 		console.log(err);

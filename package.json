@@ -1,9 +1,13 @@
 {
-	"name": "chat",
-	"version": "0.1",
-	"private": "true",
-	"dependencies": {
+	"name" : "Mashabout",
+	"version" : "0.0.1",
+	"description" : "Chat with Gifs",
+	"dependencies" : {
 		"socket.io": "0.9.16",
 		"express": "3.4.8"
+	},
+	"engines" : {
+		"node": "0.10.26"
 	}
+	
 }

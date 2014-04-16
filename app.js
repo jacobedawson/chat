@@ -4,9 +4,14 @@ var express = require('express'),
 	io = require('socket.io').listen(server),
 	mongoose = require('mongoose'),
 	// usernames which are currently connected to the chat
-	users = {},
-	rooms = {};
+	users = {};
 	
+	//express compress middleware
+	app.use(express.compress());
+
+	//Add static middleware to serve static content
+	app.use(express.static(__dirname + '/public'));
+
 //ask the server to listen for action on port 3000	
 server.listen(3000);
 
@@ -68,6 +73,8 @@ io.sockets.on('connection', function(socket){
 			if (msg.substring(0,7) === 'http://' || msg.substring(0,8) === 'https://') {
 				msg = '<a href=\"' + msg + '\" target=\"_blank\">' + msg + '</a>';
 			}
+
+
 			
 				//deal with secret messages
 				var name = pm;
@@ -92,6 +99,10 @@ io.sockets.on('connection', function(socket){
 						if(err) throw err;
 						if(msg.length == 0) { 
 							return; 
+					}
+					//if there is only 1 user online
+					if(Object.keys(users).length <= 1) {
+						msg = "<b>Ain\'t nobody else here, player :(</b><br><img src=\"http://static.nme.com/images/tumbleweed01.jpg\"/><b>You should *totes* invite someone else.<br>Don\'t leave me hanging on like a solo...</b>";
 					}
 				io.sockets.emit('new message', {msg: msg, nick: socket.nickname, to: pm});
 			});	

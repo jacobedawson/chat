@@ -1,8 +1,3 @@
-/*var unixtime = Date.now();
-			var newDate = new Date();
-			newDate.setTime(unixtime * 1000);
-			dateString = newDate.toUTCString();
-			*/
 
 		jQuery(function($){
 			var socket = io.connect();
@@ -23,7 +18,8 @@
 			var $pmWindow = $('#' + pmTarget);
 			//to capture who client is
 			var whoAmI;
-
+			//tab notification variable
+			var tabNotification = 0;
 			//End First Attempt
 			var chatTabPrivate = $('#chatTabPrivate');
 
@@ -76,7 +72,14 @@
 			$("#users").on("click", 'option', function(event) {
   					//private message grab
   					pmTarget = $(this).text();
+  					tabReducify();
 					});
+
+			//remove all notifications when message box is clicked
+			$messageBox.on("click", function() {
+				tabReducify();
+				$users.find('*').removeClass('notification');
+			});
 
 
 
@@ -102,9 +105,16 @@
 
 			socket.on('load old msgs', function(docs) {
 				for(var i=docs.length-1; i >= 0; i--) {
-					displayMsg(docs[i]);
+					loadOldMsgs(docs[i]);
 				}
 			});
+
+			//Function to distribute old messages to correct user's history - to add...
+			function loadOldMsgs(data) {
+				$chat.append('<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + 
+						'<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+					$chat.scrollTop($chat[0].scrollHeight);
+			}
 			
 			//general messaging function
 			socket.on('new message', function(data){
@@ -114,9 +124,28 @@
 				};
 			});
 
+			/*fullN[data.nick] = tabNotification;*/
+
+			//Tab Notification Function
+			function tabNotify(data) {
+				if( data.nick !== whoAmI) {
+				tabNotification+=1;
+					$('title').text('(' + tabNotification + ') - ' + 'Mashabout - Chat with Gifs, Yo!');
+					} else {
+						return;
+					}
+			}
+
+			function tabReducify() {
+				tabNotification = 0;
+				$('title').text('Mashabout - Chat with Gifs, Yo!');
+			}
+
 			//public messaging 
 			function displayMsg(data) {
-					$chat.append('<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+					tabNotify(data);	
+					$chat.append('<div class="msg"><div class="msgFrom"><b>' + data.nick + ': </b></div>' + 
+						'<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 					$chat.scrollTop($chat[0].scrollHeight);
 
 			}
@@ -125,9 +154,7 @@
 			socket.on('private', function(data) {
 				//add notification highlighting
 				$('#' + data.nick).addClass('notification');
-				displayPM(data);
-
-				
+				displayPM(data);	
 				
 			});
 
@@ -137,16 +164,15 @@
 				$(this).removeClass('notification');
 			});
 
-			//remove notification
 
 			function displayPM(data) {
-
-				$('#msgBox' + data.to).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
-				$('#msgBox' + data.nick).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + '<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
-
-
+				//add tab message notification
+					tabNotify(data);
+				$('#msgBox' + data.to).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + 
+					'<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+				$('#msgBox' + data.nick).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + 
+					'<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
 				$('#msgBox' + data.to).scrollTop($('#msgBox' + data.to)[0].scrollHeight);
-				
 			}
 
 				//toggle content divs (still in progress)

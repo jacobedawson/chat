@@ -6,14 +6,7 @@ var express = require('express'),
 	// usernames which are currently connected to the chat
 	users = {};
 
-	//connecting to Modulus database
-	/*var db = mongoose.createConnection(
-		'mongodb://<user>:<pass>@novus.modulusmongo.net:27017/puvE7muz'
-		);*/
 
-	
-	//use environmental variable PORT (for Modulus)
-	/*app.listen(process.env.PORT || 3000);*/
 
 	//express compress middleware
 	app.use(express.compress());
@@ -22,14 +15,10 @@ var express = require('express'),
 	app.use(express.static(__dirname + '/public'));
 
 //ask the server to listen for action on port 3000	
-/*
-Changing this for Modulus, return if not working
-server.listen(process.env.PORT || 3000);
-*/
+
 server.listen(3000);
+
 //connect to database at location, log error or log success
-//following line edited for modulus testing, can be wound back
-/*mongoose.connect('mongodb://root:bamboo@novus.modulusmongo.net:27017/puvE7muz', function(err) {*/
 mongoose.connect('mongodb://localhost/chat', function(err) {
 	if(err) {
 		console.log(err);
@@ -38,14 +27,26 @@ mongoose.connect('mongodb://localhost/chat', function(err) {
 	}
 });
 
-//create a mongoose schema
-var chatSchema = mongoose.Schema({
+/* 
+###Area Above This unique to environment###
+*/
+Schema = mongoose.Schema;
+
+//create a mongoose schema for the chat
+var chatSchema = new Schema({
 	nick: String,
 	msg: String,
 	created: {type: Date, default: Date.now}
 });
 
+
+//create a mongoose schema for user management i.e. logins and passwords
+//contained in the file 'user.js'
+var usermodel = require(__dirname + '/models/user.js');
+
+
 var Chat = mongoose.model('Message', chatSchema);
+
 // routing
 app.get('/', function(req, res){
 	res.sendfile(__dirname + '/index.html');
@@ -53,6 +54,7 @@ app.get('/', function(req, res){
 
 io.sockets.on('connection', function(socket){
 	var query = Chat.find({});
+	//sort messages from oldest to newest, limit equals number of msgs to save
 	query.sort('-created').limit(50).exec(function(err, docs) {
 		if(err) throw err;
 		socket.emit('load old msgs', docs);

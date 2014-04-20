@@ -6,8 +6,6 @@ var express = require('express'),
 	// usernames which are currently connected to the chat
 	users = {};
 
-
-
 	//express compress middleware
 	app.use(express.compress());
 
@@ -15,7 +13,6 @@ var express = require('express'),
 	app.use(express.static(__dirname + '/public'));
 
 //ask the server to listen for action on port 3000	
-
 server.listen(3000);
 
 //connect to database at location, log error or log success
@@ -30,6 +27,26 @@ mongoose.connect('mongodb://localhost/chat', function(err) {
 /* 
 ###Area Above This unique to environment###
 */
+
+
+// hash object to save clients data,
+// { socketid: { clientid, nickname }, socketid: { ... } }
+chatClients = new Object();
+
+//set the log level of socket.io, with log level 2
+//we won't see all the heartbeats of each sockets, 
+//only the handshakes and disconnections
+io.set('log level', 3);
+
+
+// setting the transports by order, if some client
+// is not supporting 'websockets' then the server will
+// revert to 'xhr-polling' (like Comet/Long polling).
+// for more configurations go to:
+// https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
+io.set('transports', [ 'websocket', 'xhr-polling' ]);
+
+
 Schema = mongoose.Schema;
 
 //create a mongoose schema for the chat
@@ -52,6 +69,9 @@ app.get('/', function(req, res){
 	res.sendfile(__dirname + '/index.html');
 });
 
+
+//function to handle each connection event
+//'load old msgs' is emitted to each client upon connection
 io.sockets.on('connection', function(socket){
 	var query = Chat.find({});
 	//sort messages from oldest to newest, limit equals number of msgs to save
@@ -61,13 +81,16 @@ io.sockets.on('connection', function(socket){
 	});
  		
 	socket.on('new user', function(data, callback) {
+		//first check if user is logged in
 		if(data in users) {
 			callback(false);
+			//otherwise, send true, save data as the client name
 		} else {
 			callback(true);
 			socket.nickname = data;
 			users[socket.nickname] = socket;
 			updateNicknames();
+			console.log(data + ' has a socket no. of ' + socket.id);
 		}
 	});
 

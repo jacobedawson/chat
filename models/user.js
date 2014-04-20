@@ -1,5 +1,4 @@
 var UserSchema = new Schema({
-	name: String,
 	email: String,
 	username: String,
 	password: String,

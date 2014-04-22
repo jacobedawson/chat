@@ -33,8 +33,9 @@
 					if(data) {
 						$('#nickWrap').hide();
 						$('#contentWrap').show();
-					} else {
-						$nickError.html('That name is taken bro, try another one.')
+					} 
+					else {
+						$nickError.html('That name is taken bro, try another one.');
 					}
 				});
 				$nickBox.val('');
@@ -88,10 +89,6 @@
 				pmTarget = ' ';
 			});
 
-
-
-
-		
 
 			//this essentially makes every message either group or private, with group the default
 			$messageForm.submit(function(e){

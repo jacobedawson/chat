@@ -152,7 +152,6 @@
 				//add notification highlighting
 				$('#' + data.nick).addClass('notification');
 				displayPM(data);	
-				
 			});
 
 
@@ -161,16 +160,24 @@
 				$(this).removeClass('notification');
 			});
 
+			
 
 			function displayPM(data) {
 				//add tab message notification
 					tabNotify(data);
 				$('#msgBox' + data.to).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + 
 					'<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
+
 				$('#msgBox' + data.nick).append('<div class="private msg"><b><div class="msgFrom"><b>' + data.nick + ': </b></div>' + 
 					'<div class ="msgBody">' + data.msg + '</div>' + "</div><br/>");
-				$('#msgBox' + data.to).scrollTop($('#msgBox' + data.to)[0].scrollHeight);
-			}
+				
+				if(data.to == whoAmI) {
+					$('#msgBox' + data.nick).scrollTop($('#msgBox' + data.nick)[0].scrollHeight);
+				} else {
+					$('#msgBox' + data.to).scrollTop($('#msgBox' + data.to)[0].scrollHeight);
+				}
+				
+			};
 
 				//toggle content divs (still in progress)
 				//currently '$this' is the entire a href tag

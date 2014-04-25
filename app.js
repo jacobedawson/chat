@@ -102,17 +102,26 @@ io.sockets.on('connection', function(socket){
 		io.sockets.emit('usernames', Object.keys(users));
 	}
 
+	//create regular expression to look for img extensions
+	var myRegEx = new RegExp("^(https?|ftp)://.*(jpeg|png|jpg|gif|bmp)");
+
 	socket.on('send message', function(data, pm, callback){
 		var msg = data.trim();
 			//add html tags to imgs #problem - converts all links to images, need type check somehow
-			if(msg.substring(0,7) === 'http://' && msg.substring(msg.length - 4) === '.gif') {
+			/*if(msg.substring(0,7) === 'http://' && msg.substring(msg.length - 4) === '.gif') {
 			    msg = '<img src=\"' + msg + '\"\/>';
-			} 
+			} */
+
+			//check regular expression against message, append img tags where appropriate
+			if(myRegEx.test(msg)) {
+				msg = '<img src=\"' + msg + '\"\/>';
+			}
+
+
 			//checks for links, adds anchor tags
 			if (msg.substring(0,7) === 'http://' || msg.substring(0,8) === 'https://') {
 				msg = '<a href=\"' + msg + '\" target=\"_blank\">' + msg + '</a>';
 			}
-
 
 			
 				//deal with secret messages
